@@ -1,0 +1,160 @@
+/* stylelint-disable */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+    --background: 240 10% 8%;
+    --foreground: 45 100% 95%;
+    --card: 240 8% 12%;
+    --card-foreground: 45 100% 95%;
+    --popover: 240 8% 12%;
+    --popover-foreground: 45 100% 95%;
+    --primary: 45 100% 55%;
+    --primary-foreground: 240 10% 8%;
+    --secondary: 120 40% 45%;
+    --secondary-foreground: 45 100% 95%;
+    --muted: 240 8% 18%;
+    --muted-foreground: 45 20% 65%;
+    --accent: 0 85% 55%;
+    --accent-foreground: 45 100% 95%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 45 100% 95%;
+    --border: 240 8% 20%;
+    --input: 240 8% 20%;
+    --ring: 45 100% 55%;
+    
+    /* 五行元素颜色 */
+    --element-metal: 45 100% 55%;    /* 金 - 金黄色 */
+    --element-wood: 120 40% 45%;     /* 木 - 青绿色 */
+    --element-water: 210 85% 45%;    /* 水 - 深蓝色 */
+    --element-fire: 0 85% 55%;       /* 火 - 赤红色 */
+    --element-earth: 35 65% 50%;     /* 土 - 土黄色 */
+    
+    /* 货币颜色 */
+    --currency-yin: 270 50% 60%;     /* 阴 - 紫色 */
+    --currency-yang: 30 100% 60%;    /* 阳 - 橙色 */
+    
+    /* 光晕效果 */
+    --glow-metal: 0 0 20px hsl(45 100% 55% / 0.5);
+    --glow-wood: 0 0 20px hsl(120 40% 45% / 0.5);
+    --glow-water: 0 0 20px hsl(210 85% 45% / 0.5);
+    --glow-fire: 0 0 20px hsl(0 85% 55% / 0.5);
+    --glow-earth: 0 0 20px hsl(35 65% 50% / 0.5);
+  }
+
+  .dark {
+    --background: 240 10% 8%;
+    --foreground: 45 100% 95%;
+    --card: 240 8% 12%;
+    --card-foreground: 45 100% 95%;
+    --popover: 240 8% 12%;
+    --popover-foreground: 45 100% 95%;
+    --primary: 45 100% 55%;
+    --primary-foreground: 240 10% 8%;
+    --secondary: 120 40% 45%;
+    --secondary-foreground: 45 100% 95%;
+    --muted: 240 8% 18%;
+    --muted-foreground: 45 20% 65%;
+    --accent: 0 85% 55%;
+    --accent-foreground: 45 100% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 45 100% 95%;
+    --border: 240 8% 20%;
+    --input: 240 8% 20%;
+    --ring: 45 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .element-metal {
+    color: hsl(var(--element-metal));
+  }
+  
+  .element-wood {
+    color: hsl(var(--element-wood));
+  }
+  
+  .element-water {
+    color: hsl(var(--element-water));
+  }
+  
+  .element-fire {
+    color: hsl(var(--element-fire));
+  }
+  
+  .element-earth {
+    color: hsl(var(--element-earth));
+  }
+  
+  .bg-element-metal {
+    background-color: hsl(var(--element-metal));
+  }
+  
+  .bg-element-wood {
+    background-color: hsl(var(--element-wood));
+  }
+  
+  .bg-element-water {
+    background-color: hsl(var(--element-water));
+  }
+  
+  .bg-element-fire {
+    background-color: hsl(var(--element-fire));
+  }
+  
+  .bg-element-earth {
+    background-color: hsl(var(--element-earth));
+  }
+  
+  .border-element-metal {
+    border-color: hsl(var(--element-metal));
+  }
+  
+  .border-element-wood {
+    border-color: hsl(var(--element-wood));
+  }
+  
+  .border-element-water {
+    border-color: hsl(var(--element-water));
+  }
+  
+  .border-element-fire {
+    border-color: hsl(var(--element-fire));
+  }
+  
+  .border-element-earth {
+    border-color: hsl(var(--element-earth));
+  }
+  
+  /* 动画效果 */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+}
+
