@@ -27,7 +27,7 @@ public static class UIHelper
         buttonText.color = Color.black;
         
         // Set font (you may need to adjust this based on your project)
-        buttonText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        buttonText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         
         // Set rect transform
         RectTransform buttonRT = buttonGO.GetComponent<RectTransform>();
@@ -63,7 +63,7 @@ public static class UIHelper
         uiText.color = Color.white;
         
         // Set font (you may need to adjust this based on your project)
-        uiText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        uiText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         
         // Set rect transform
         RectTransform textRT = textGO.GetComponent<RectTransform>();

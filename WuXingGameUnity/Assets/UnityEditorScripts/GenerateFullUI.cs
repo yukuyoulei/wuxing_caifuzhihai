@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class GenerateFullUI : EditorWindow
 {
@@ -73,7 +74,7 @@ public class GenerateFullUI : EditorWindow
         textGO.transform.SetParent(parent);
         Text txt = textGO.AddComponent<Text>();
         txt.text = content;
-        txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         txt.fontSize = fontSize;
         txt.alignment = TextAnchor.MiddleCenter;
         RectTransform rt = textGO.GetComponent<RectTransform>();
@@ -95,7 +96,7 @@ public class GenerateFullUI : EditorWindow
         txtGO.transform.SetParent(btnGO.transform);
         Text txt = txtGO.AddComponent<Text>();
         txt.text = label;
-        txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        txt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         txt.alignment = TextAnchor.MiddleCenter;
 
         RectTransform rt = btnGO.GetComponent<RectTransform>();

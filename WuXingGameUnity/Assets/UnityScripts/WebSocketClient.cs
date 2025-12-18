@@ -12,6 +12,7 @@ public class WebSocketClient : MonoBehaviour
     private ClientWebSocket webSocket;
     private CancellationTokenSource cancellationTokenSource;
     private string serverUrl = "ws://localhost:5000/gameHub"; // SignalR hub endpoint
+    private string secureServerUrl = "wss://localhost:5001/gameHub"; // Secure SignalR hub endpoint
     
     // Thread-safe message queue for handling WebSocket messages on the main thread
     private ConcurrentQueue<string> messageQueue = new ConcurrentQueue<string>();
@@ -37,26 +38,57 @@ public class WebSocketClient : MonoBehaviour
     
     async void ConnectToServer()
     {
+        // First try to connect to the regular endpoint
+        if (await TryConnectToEndpoint(serverUrl))
+        {
+            return;
+        }
+        
+        // If that fails, try the secure endpoint
+        Debug.Log("Failed to connect to regular endpoint, trying secure endpoint...");
+        await TryConnectToEndpoint(secureServerUrl);
+    }
+    
+    private async Task<bool> TryConnectToEndpoint(string url)
+    {
         try
         {
             webSocket = new ClientWebSocket();
             cancellationTokenSource = new CancellationTokenSource();
             
-            Debug.Log("Connecting to server: " + serverUrl);
-            await webSocket.ConnectAsync(new Uri(serverUrl), cancellationTokenSource.Token);
-            Debug.Log("Connected to server");
+            Debug.Log("Attempting to connect to server: " + url);
+            
+            // Add some diagnostic information
+            Debug.Log("Current platform: " + Application.platform);
+            Debug.Log("Current time: " + DateTime.Now);
+            
+            await webSocket.ConnectAsync(new Uri(url), cancellationTokenSource.Token);
+            Debug.Log("Successfully connected to server. State: " + webSocket.State);
             
             // Send negotiation message for SignalR
             var negotiateMessage = "{\"protocol\":\"json\",\"version\":1}" + (char)0x1e;
             var negotiateBuffer = Encoding.UTF8.GetBytes(negotiateMessage);
             await webSocket.SendAsync(new ArraySegment<byte>(negotiateBuffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            Debug.Log("Sent SignalR negotiation message");
             
             // Start listening for messages
             _ = ListenForMessages();
+            
+            return true;
         }
         catch (Exception ex)
         {
-            Debug.LogError("Failed to connect to server: " + ex.Message);
+            Debug.LogError("Failed to connect to server at " + url + ": " + ex.Message);
+            Debug.LogError("Exception type: " + ex.GetType().Name);
+            Debug.LogError("Stack trace: " + ex.StackTrace);
+            
+            // Additional diagnostic information
+            if (webSocket != null)
+            {
+                Debug.LogError("WebSocket state: " + webSocket.State);
+            }
+            
+            return false;
         }
     }
     
@@ -160,6 +192,26 @@ public class WebSocketClient : MonoBehaviour
     {
         var joinHubMessage = $"{{\"type\":1,\"invocationId\":\"1\",\"target\":\"JoinGame\",\"arguments\":[\"{playerId}\"]}}";
         SendMessage(joinHubMessage);
+    }
+    
+    // Test connection method
+    public async void TestConnection()
+    {
+        try
+        {
+            using (var testClient = new ClientWebSocket())
+            {
+                var testUri = new Uri(serverUrl);
+                Debug.Log("Testing connection to: " + testUri);
+                await testClient.ConnectAsync(testUri, CancellationToken.None);
+                Debug.Log("Test connection successful. State: " + testClient.State);
+                await testClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test complete", CancellationToken.None);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("Test connection failed: " + ex.Message);
+        }
     }
     
     public void SelectElement(string playerId, string element)

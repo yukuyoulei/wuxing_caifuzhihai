@@ -6,7 +6,7 @@ public class UIManager : MonoBehaviour
 {
     public Canvas canvas;
     public GameManager gameManager;
-    public BattleAreaController battleAreaController;
+    public UIController uiController;
     
     // UI Panels
     private GameObject battleAreaPanel;
@@ -45,6 +45,7 @@ public class UIManager : MonoBehaviour
         }
         
         CreateUI();
+        BindUIEvents();
         UpdateUI();
     }
     
@@ -78,6 +79,41 @@ public class UIManager : MonoBehaviour
         CreateBattleAreaUI();
         CreateActionControlsUI();
         CreatePlayerStatusUI();
+    }
+    
+    void BindUIEvents()
+    {
+        // Bind action button events
+        if (startAdventureButton != null)
+            startAdventureButton.onClick.AddListener(OnStartAdventureClicked);
+            
+        if (replenishButton != null)
+            replenishButton.onClick.AddListener(OnReplenishClicked);
+            
+        if (returnHomeButton != null)
+            returnHomeButton.onClick.AddListener(OnReturnHomeClicked);
+            
+        if (resetButton != null)
+            resetButton.onClick.AddListener(OnResetClicked);
+            
+        if (skillButton != null)
+            skillButton.onClick.AddListener(OnSkillClicked);
+            
+        // Bind player element button events
+        for (int i = 0; i < playerElementButtons.Length && i < 5; i++)
+        {
+            int index = i; // Capture variable for closure
+            if (playerElementButtons[i] != null)
+                playerElementButtons[i].onClick.AddListener(() => OnPlayerElementClicked(index));
+        }
+        
+        // Bind opponent element button events
+        for (int i = 0; i < opponentElementButtons.Length && i < 3; i++)
+        {
+            int index = i; // Capture variable for closure
+            if (opponentElementButtons[i] != null)
+                opponentElementButtons[i].onClick.AddListener(() => OnOpponentElementClicked(index));
+        }
     }
     
     void CreateBattleAreaUI()
@@ -114,8 +150,7 @@ public class UIManager : MonoBehaviour
             GameObject buttonGO = UIHelper.CreateButton(
                 "PlayerElement_" + elements[i],
                 GameUtils.GetElementIcon(elements[i]) + "\n" + GameUtils.GetElementName(elements[i]),
-                playerElementPanel.transform,
-                () => OnPlayerElementClicked(i)
+                playerElementPanel.transform
             );
             
             playerElementButtons[i] = buttonGO.GetComponent<Button>();
@@ -134,8 +169,7 @@ public class UIManager : MonoBehaviour
             GameObject buttonGO = UIHelper.CreateButton(
                 "OpponentElement_" + i,
                 "?",
-                opponentElementPanel.transform,
-                () => OnOpponentElementClicked(i)
+                opponentElementPanel.transform
             );
             
             opponentElementButtons[i] = buttonGO.GetComponent<Button>();
@@ -155,36 +189,31 @@ public class UIManager : MonoBehaviour
         startAdventureButton = UIHelper.CreateButton(
             "StartAdventureButton",
             "开始探险",
-            actionControlsPanel.transform,
-            OnStartAdventureClicked
+            actionControlsPanel.transform
         ).GetComponent<Button>();
         
         replenishButton = UIHelper.CreateButton(
             "ReplenishButton",
             "NPC补充元素",
-            actionControlsPanel.transform,
-            OnReplenishClicked
+            actionControlsPanel.transform
         ).GetComponent<Button>();
         
         returnHomeButton = UIHelper.CreateButton(
             "ReturnHomeButton",
             "返回出生点",
-            actionControlsPanel.transform,
-            OnReturnHomeClicked
+            actionControlsPanel.transform
         ).GetComponent<Button>();
         
         resetButton = UIHelper.CreateButton(
             "ResetButton",
             "重置游戏",
-            actionControlsPanel.transform,
-            OnResetClicked
+            actionControlsPanel.transform
         ).GetComponent<Button>();
         
         skillButton = UIHelper.CreateButton(
             "SkillButton",
             "技能系统",
-            actionControlsPanel.transform,
-            OnSkillClicked
+            actionControlsPanel.transform
         ).GetComponent<Button>();
         
         // Position buttons vertically
@@ -271,7 +300,7 @@ public class UIManager : MonoBehaviour
     {
         if (gameManager == null) return;
         
-        GameState gameState = GetGameState();
+        GameState gameState = gameManager.GetGameState();
         if (gameState == null) return;
         
         // Update position
@@ -310,75 +339,60 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    GameState GetGameState()
+    // Button click handlers (these will be connected through UIController)
+    public void OnStartAdventureClicked()
     {
-        // This is a simplified approach - in a real implementation, 
-        // you would get the actual game state from the GameManager
-        return new GameState();
-    }
-    
-    // Button click handlers
-    void OnStartAdventureClicked()
-    {
-        Debug.Log("Start Adventure clicked");
-        if (gameManager != null)
+        if (uiController != null)
         {
-            gameManager.StartAdventure();
-            UpdateUI();
+            uiController.OnStartAdventureClicked();
         }
     }
     
-    void OnReplenishClicked()
+    public void OnReplenishClicked()
     {
-        Debug.Log("Replenish Elements clicked");
-        if (gameManager != null)
+        if (uiController != null)
         {
-            gameManager.ReplenishElements();
-            UpdateUI();
+            uiController.OnReplenishClicked();
         }
     }
     
-    void OnReturnHomeClicked()
+    public void OnReturnHomeClicked()
     {
-        Debug.Log("Return Home clicked");
-        if (gameManager != null)
+        if (uiController != null)
         {
-            gameManager.ReturnToSpawn();
-            UpdateUI();
+            uiController.OnReturnHomeClicked();
         }
     }
     
-    void OnResetClicked()
+    public void OnResetClicked()
     {
-        Debug.Log("Reset Game clicked");
-        if (gameManager != null)
+        if (uiController != null)
         {
-            gameManager.ResetGame();
-            UpdateUI();
+            uiController.OnResetClicked();
         }
     }
     
-    void OnSkillClicked()
+    public void OnSkillClicked()
     {
-        Debug.Log("Skill System clicked");
-        // TODO: Implement skill system UI
-    }
-    
-    void OnPlayerElementClicked(int index)
-    {
-        Debug.Log("Player Element " + index + " clicked");
-        if (battleAreaController != null)
+        if (uiController != null)
         {
-            battleAreaController.OnPlayerElementSelected(index);
+            uiController.OnSkillClicked();
         }
     }
     
-    void OnOpponentElementClicked(int index)
+    public void OnPlayerElementClicked(int index)
     {
-        Debug.Log("Opponent Element " + index + " clicked");
-        if (battleAreaController != null)
+        if (uiController != null)
         {
-            battleAreaController.OnOpponentElementRevealed(index);
+            uiController.OnPlayerElementClicked(index);
+        }
+    }
+    
+    public void OnOpponentElementClicked(int index)
+    {
+        if (uiController != null)
+        {
+            uiController.OnOpponentElementClicked(index);
         }
     }
 }

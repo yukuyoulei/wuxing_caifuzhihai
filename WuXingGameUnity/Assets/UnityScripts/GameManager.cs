@@ -53,6 +53,19 @@ public class GameManager : MonoBehaviour
         }
     }
     
+    // 获取游戏状态
+    public GameState GetGameState()
+    {
+        return gameState;
+    }
+    
+    // 设置游戏状态
+    public void SetGameState(GameState newState)
+    {
+        gameState = newState;
+        UpdateUI();
+    }
+    
     // 开始探险
     public void StartAdventure()
     {

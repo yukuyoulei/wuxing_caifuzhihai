@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class UIController : MonoBehaviour
 {
     public GameManager gameManager;
-    public BattleAreaController battleAreaController;
+    public BattleSystem battleSystem;
     public WebSocketClient webSocketClient;
+    public UIManager uiManager;
     
     // Action buttons
     public Button startAdventureButton;
@@ -23,6 +25,9 @@ public class UIController : MonoBehaviour
     // Currency buttons
     public Button useYinCurrencyButton;
     public Button useYangCurrencyButton;
+    
+    // Battle round selection for currency usage
+    private int selectedBattleRound = -1;
     
     void Start()
     {
@@ -72,71 +77,146 @@ public class UIController : MonoBehaviour
         }
     }
     
-    void OnStartAdventureClicked()
+    public void OnStartAdventureClicked()
     {
         Debug.Log("Start Adventure clicked");
-        if (gameManager != null)
+        if (battleSystem != null)
         {
-            gameManager.StartAdventure();
+            battleSystem.StartBattle();
+        }
+        
+        if (uiManager != null)
+        {
+            uiManager.UpdateUI();
         }
     }
     
-    void OnReplenishClicked()
+    public void OnReplenishClicked()
     {
         Debug.Log("Replenish Elements clicked");
         if (gameManager != null)
         {
             gameManager.ReplenishElements();
         }
+        
+        if (uiManager != null)
+        {
+            uiManager.UpdateUI();
+        }
     }
     
-    void OnReturnHomeClicked()
+    public void OnReturnHomeClicked()
     {
         Debug.Log("Return Home clicked");
         if (gameManager != null)
         {
             gameManager.ReturnToSpawn();
         }
+        
+        if (uiManager != null)
+        {
+            uiManager.UpdateUI();
+        }
     }
     
-    void OnResetClicked()
+    public void OnResetClicked()
     {
         Debug.Log("Reset Game clicked");
         if (gameManager != null)
         {
             gameManager.ResetGame();
         }
+        
+        if (uiManager != null)
+        {
+            uiManager.UpdateUI();
+        }
     }
     
-    void OnSkillClicked()
+    public void OnSkillClicked()
     {
         Debug.Log("Skill System clicked");
         // TODO: Implement skill system UI
     }
     
-    void OnPlayerElementClicked(int index)
+    public void OnPlayerElementClicked(int index)
     {
         Debug.Log("Player Element " + index + " clicked");
-        if (battleAreaController != null)
+        
+        // Convert index to ElementType
+        List<ElementType> elements = GameUtils.GetAllElements();
+        if (index >= 0 && index < elements.Count)
         {
-            battleAreaController.OnPlayerElementSelected(index);
+            ElementType elementType = elements[index];
+            
+            if (battleSystem != null)
+            {
+                battleSystem.SelectPlayerElement(elementType);
+            }
+            
+            // Highlight selected button
+            for (int i = 0; i < playerElementButtons.Length; i++)
+            {
+                if (playerElementButtons[i] != null)
+                {
+                    if (i == index)
+                    {
+                        playerElementButtons[i].image.color = Color.yellow;
+                    }
+                    else
+                    {
+                        playerElementButtons[i].image.color = Color.white;
+                    }
+                }
+            }
         }
     }
     
-    void OnOpponentElementClicked(int index)
+    public void OnOpponentElementClicked(int index)
     {
         Debug.Log("Opponent Element " + index + " clicked");
-        if (battleAreaController != null)
+        if (battleSystem != null)
         {
-            battleAreaController.OnOpponentElementRevealed(index);
+            battleSystem.RevealOpponentElement(index);
+        }
+        
+        if (uiManager != null)
+        {
+            uiManager.UpdateUI();
         }
     }
     
-    void OnUseCurrencyClicked(CurrencyType currencyType)
+    public void OnUseCurrencyClicked(CurrencyType currencyType)
     {
         Debug.Log("Use " + currencyType + " Currency clicked");
-        // TODO: Implement currency usage logic
-        // This would typically involve selecting a battle round to reverse
+        
+        // Check if we have a selected battle round
+        if (selectedBattleRound >= 0)
+        {
+            if (battleSystem != null)
+            {
+                battleSystem.UseCurrencyToReverse(selectedBattleRound, currencyType);
+            }
+            
+            if (uiManager != null)
+            {
+                uiManager.UpdateUI();
+            }
+            
+            // Reset selection
+            selectedBattleRound = -1;
+        }
+        else
+        {
+            Debug.Log("请选择要扭转的战斗回合");
+        }
+    }
+    
+    // Method to select a battle round for currency usage
+    public void SelectBattleRound(int roundIndex)
+    {
+        selectedBattleRound = roundIndex;
+        Debug.Log("选择战斗回合 " + roundIndex + " 用于货币扭转");
     }
     
     // WebSocket event handlers
@@ -144,6 +224,11 @@ public class UIController : MonoBehaviour
     {
         Debug.Log("Battle result received: " + message);
         // TODO: Update UI with battle result
+        
+        if (uiManager != null)
+        {
+            uiManager.UpdateUI();
+        }
     }
     
     void OnPlayerJoined(string message)
@@ -156,6 +241,11 @@ public class UIController : MonoBehaviour
     {
         Debug.Log("Element selected: " + message);
         // TODO: Update UI for element selection
+        
+        if (uiManager != null)
+        {
+            uiManager.UpdateUI();
+        }
     }
     
     void OnDestroy()
